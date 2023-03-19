@@ -1,0 +1,24 @@
+[
+    {
+        "name": "Server1",
+        "instances": [
+            {
+                "tag": "http",
+                "port": 8080
+            },
+            {
+                "tag": "https",
+                "port": 8443,
+                "ssl": true,
+                "ssl_priv": "./private.pem",
+                "ssl_pub": "./public.pem"
+            }
+        ],
+        "root": "/home/aapo/cerverus/example",
+        "paths": {
+            "/": "/index.html",
+            "/**": "/**"
+        },
+        "fallback": "/404.html"
+    } 
+]
