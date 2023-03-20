@@ -9,6 +9,7 @@
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/src/cerverus.py",
+            "args": ["./cerverus.json"],
             "console": "integratedTerminal",
             "justMyCode": true
         }

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# Run the python script:
+chmod +x ./src/cerverus.py
+./src/cerverus.py $@

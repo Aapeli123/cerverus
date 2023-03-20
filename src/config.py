@@ -1,7 +1,8 @@
 import json
 import os
+from typing import Optional, Dict, List
 class CerverInstance:
-    def __init__(self, tag: str, port: int, ssl: bool, privkey: str | None, pubkey: str | None) -> None:
+    def __init__(self, tag: str, port: int, ssl: bool, privkey: Optional[str], pubkey: Optional[str]) -> None:
         self.port = port
         self.ssl = ssl
         self.tag = tag
@@ -12,11 +13,10 @@ class CerverInstance:
         sslstr = f"""ssl
 sslkeys {self.pubkey} {self.privkey}""" if self.ssl else ""
         return f"""port {self.port}
-{sslstr}
-        """
+{sslstr}"""
         
 class CerverusServer:
-    def __init__(self, name: str, instances: list[CerverInstance], routes: dict[str, str], root: str, fallback: str) -> None:
+    def __init__(self, name: str, instances: List[CerverInstance], routes: Dict[str, str], root: str, fallback: str) -> None:
         self.name = name
         self.instances = instances
         self.routes = routes
@@ -30,8 +30,7 @@ class CerverusServer:
 
         return f"""root {self.root}
 {routestr}
-fallback {self.fallback}
-        """
+fallback {self.fallback}"""
 
     def serialize(self, dirpath = "./configs/"):
         for instance in self.instances:
@@ -41,8 +40,7 @@ fallback {self.fallback}
             server_str = self.__get_str()
             instance_specific_str = instance.get_str()
             server_config_str = f"""{instance_specific_str}
-{server_str}
-            """
+{server_str}"""
             with open(path, "w") as outfile:
                 outfile.write(server_config_str)
 
@@ -50,7 +48,7 @@ fallback {self.fallback}
 
 
 class CerverusConfig:
-    def __init__(self, servers: list[CerverusServer]) -> None:
+    def __init__(self, servers: List[CerverusServer]) -> None:
         self.servers: list[CerverusServer] = servers
     def serialize(self, config_files_loc="./configs/"):
         for server in self.servers:

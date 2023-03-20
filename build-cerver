@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cd cerver
+./scripts/configure
+make
+cd ..
