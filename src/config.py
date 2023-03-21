@@ -14,7 +14,8 @@ class CerverInstance:
 sslkeys {self.pubkey} {self.privkey}""" if self.ssl else ""
         return f"""port {self.port}
 {sslstr}"""
-        
+
+
 class CerverusServer:
     def __init__(self, name: str, instances: List[CerverInstance], routes: Dict[str, str], root: str, fallback: str) -> None:
         self.name = name

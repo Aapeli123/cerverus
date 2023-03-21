@@ -6,15 +6,15 @@ class CerverProcess:
         self.config_file = config_file
         self.subprocess = None
         self.__cerver_path = cerver_pth
+        print(config_file)
 
     def start(self):
-        self.subprocess = subprocess.Popen(self.config_file, executable=self.__cerver_path)
+        self.subprocess = subprocess.Popen([self.__cerver_path, self.config_file])
         pass
     
     def stop(self):
         self.subprocess.send_signal(signal.SIGINT)
-        output = str(self.subprocess.stdout)
-        print(f"PROCESS OUTPUT:\n{output}")
+        
 
     def restart(self):
         self.stop()

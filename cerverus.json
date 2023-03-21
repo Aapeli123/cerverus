@@ -10,7 +10,7 @@
                 "tag": "https",
                 "port": 8443,
                 "ssl": true,
-                "ssl_priv": "./private.pem",
+                "ssl_priv": "./cerver/private.pem",
                 "ssl_pub": "./public.pem"
             }
         ],
