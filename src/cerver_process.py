@@ -10,11 +10,9 @@ class CerverProcess:
 
     def start(self):
         self.subprocess = subprocess.Popen([self.__cerver_path, self.config_file])
-        pass
     
     def stop(self):
         self.subprocess.send_signal(signal.SIGINT)
-        
 
     def restart(self):
         self.stop()

@@ -11,7 +11,7 @@
                 "port": 8443,
                 "ssl": true,
                 "ssl_priv": "./cerver/private.pem",
-                "ssl_pub": "./public.pem"
+                "ssl_pub": "./cerver/public.pem"
             }
         ],
         "root": "/home/aapo/cerverus/example",
