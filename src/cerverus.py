@@ -41,6 +41,7 @@ conf = config.read_config(args.config_file)
 
 cerverus = Cerverus(conf)
 cerverus.gen_configs()
+
 cerverus.start()
 input()
 cerverus.stop()

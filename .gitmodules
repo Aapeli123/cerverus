@@ -1,3 +1,4 @@
 [submodule "cerver"]
 	path = cerver
 	url = https://github.com/Aapeli123/cerver.git
+	branch = main

@@ -4,20 +4,29 @@
         "instances": [
             {
                 "tag": "http",
-                "port": 8080
+                "port": 8080,
+                "redirects": {
+                    "/redirect_only_http": "https://google.com"
+                }
             },
             {
                 "tag": "https",
                 "port": 8443,
                 "ssl": true,
                 "ssl_priv": "./cerver/private.pem",
-                "ssl_pub": "./cerver/public.pem"
+                "ssl_pub": "./cerver/public.pem",
+                "paths": {
+                    "/secret_index": "/index.html"
+                }
             }
         ],
         "root": "/home/aapo/cerverus/example",
         "paths": {
             "/": "/index.html",
             "/**": "/**"
+        },
+        "redirects": {
+            "/redirect": "https://watchwithfriends.ml"
         },
         "fallback": "/404.html"
     } 

@@ -2,10 +2,12 @@ import json
 import os
 from typing import Optional, Dict, List
 class CerverInstance:
-    def __init__(self, tag: str, port: int, ssl: bool, privkey: Optional[str], pubkey: Optional[str]) -> None:
+    def __init__(self, tag: str, port: int, ssl: bool, privkey: Optional[str], pubkey: Optional[str], routes: Optional[Dict[str, str]] = None, redirects: Optional[Dict[str, str]] = None) -> None:
         self.port = port
         self.ssl = ssl
         self.tag = tag
+        self.routes = routes
+        self.redirects = redirects
         if self.ssl and privkey != None and pubkey != None:
             self.privkey = privkey
             self.pubkey = pubkey
@@ -13,14 +15,25 @@ class CerverInstance:
         sslstr = f"""ssl
 sslkeys {self.pubkey} {self.privkey}""" if self.ssl else ""
         return f"""port {self.port}
-{sslstr}"""
+{sslstr}\n{self.__get_routes_and_redirs()}"""
+    def __get_routes_and_redirs(self) -> str:
+        routestr = ""
+        if self.routes != None:
+            for route in self.routes:
+                routestr += f"loc {route} {self.routes[route]}\n"
+        
+        if self.redirects != None:
+            for redir in self.redirects:
+                routestr += f"redirect {redir} {self.redirects[redir]}\n"
 
+        return routestr
 
 class CerverusServer:
-    def __init__(self, name: str, instances: List[CerverInstance], routes: Dict[str, str], root: str, fallback: str) -> None:
+    def __init__(self, name: str, instances: List[CerverInstance], routes: Dict[str, str], root: str, fallback: str, redirects: Optional[Dict[str, str]] = None) -> None:
         self.name = name
         self.instances = instances
         self.routes = routes
+        self.redirects = redirects
         self.root = root
         self.fallback = fallback
     
@@ -28,6 +41,10 @@ class CerverusServer:
         routestr = ""
         for route in self.routes:
             routestr += f"loc {route} {self.routes[route]}\n"
+
+        if self.redirects != None:
+            for redir in self.redirects:
+                routestr += f"redirect {redir} {self.redirects[redir]}\n"
 
         return f"""root {self.root}
 {routestr}
@@ -55,14 +72,22 @@ class CerverusConfig:
         for server in self.servers:
             server.serialize(config_files_loc)
             pass
-            
+
+
+def get_dict_optional(dictionary, key):
+    try:
+        return dictionary[key]
+    except KeyError:
+        return None 
+    
 
 def read_config(config_file: str) -> CerverusConfig:
     with open(config_file) as conf_json:
         servers = json.load(conf_json)
         server_list = []
         for server in servers:
-            routes = server["paths"]
+            server_routes = server["paths"]
+            server_redirects = get_dict_optional(server, "redirects")
             fallback = server["fallback"]
             root = server["root"]
             name = server["name"]
@@ -71,6 +96,8 @@ def read_config(config_file: str) -> CerverusConfig:
             for i in server["instances"]:
                 port = i["port"]
                 tag = i["tag"]
+                i_routes = get_dict_optional(i, "paths")
+                i_redirects = get_dict_optional(i, "redirects")
                 privkey = None
                 pubkey = None
                 try:
@@ -80,8 +107,8 @@ def read_config(config_file: str) -> CerverusConfig:
                         privkey = i["ssl_priv"]
                 except KeyError:
                     ssl = False
-                instance = CerverInstance(tag, port, ssl, privkey, pubkey)
+                instance = CerverInstance(tag, port, ssl, privkey, pubkey, i_routes, i_redirects)
                 instances.append(instance)
-            s = CerverusServer(name, instances, routes, root, fallback)
+            s = CerverusServer(name, instances, server_routes, root, fallback, server_redirects)
             server_list.append(s)
     return CerverusConfig(server_list)
