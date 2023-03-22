@@ -57,8 +57,7 @@ fallback {self.fallback}"""
                 os.makedirs(f"{dirpath}{self.name}/")
             server_str = self.__get_str()
             instance_specific_str = instance.get_str()
-            server_config_str = f"""{instance_specific_str}
-{server_str}"""
+            server_config_str = f"""{server_str}\n{instance_specific_str}"""
             with open(path, "w") as outfile:
                 outfile.write(server_config_str)
 
