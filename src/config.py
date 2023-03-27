@@ -1,6 +1,10 @@
 import json
 import os
+import multiprocessing
 from typing import Optional, Dict, List
+def get_threads_for_instance(instances: int) -> int:
+    return multiprocessing.cpu_count() // instances
+
 class CerverInstance:
     def __init__(self, tag: str, port: int, ssl: bool, privkey: Optional[str], pubkey: Optional[str], routes: Optional[Dict[str, str]] = None, redirects: Optional[Dict[str, str]] = None) -> None:
         self.port = port
@@ -29,14 +33,14 @@ sslkeys {self.pubkey} {self.privkey}""" if self.ssl else ""
         return routestr
 
 class CerverusServer:
-    def __init__(self, name: str, instances: List[CerverInstance], routes: Dict[str, str], root: str, fallback: str, redirects: Optional[Dict[str, str]] = None) -> None:
+    def __init__(self, name: str, instances: List[CerverInstance], routes: Dict[str, str], root: str, fallback: str, redirects: Optional[Dict[str, str]] = None, threads=0) -> None:
         self.name = name
         self.instances = instances
         self.routes = routes
         self.redirects = redirects
         self.root = root
         self.fallback = fallback
-    
+        self.threads = threads
     def __get_str(self) -> str:
         routestr = ""
         for route in self.routes:
@@ -47,6 +51,7 @@ class CerverusServer:
                 routestr += f"redirect {redir} {self.redirects[redir]}\n"
 
         return f"""root {self.root}
+threads {self.threads}
 {routestr}
 fallback {self.fallback}"""
 
@@ -108,6 +113,6 @@ def read_config(config_file: str) -> CerverusConfig:
                     ssl = False
                 instance = CerverInstance(tag, port, ssl, privkey, pubkey, i_routes, i_redirects)
                 instances.append(instance)
-            s = CerverusServer(name, instances, server_routes, root, fallback, server_redirects)
+            s = CerverusServer(name, instances, server_routes, root, fallback, server_redirects, threads=get_threads_for_instance(len(instances)))
             server_list.append(s)
     return CerverusConfig(server_list)
